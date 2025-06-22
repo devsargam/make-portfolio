@@ -309,3 +309,67 @@ export async function saveEducation(formData: FormData) {
 
   await persistSection(userId, username, educationSection);
 }
+
+/* -------------------------------------------------------------------------- */
+/*                   Bulk save action from structured JSON                    */
+/* -------------------------------------------------------------------------- */
+
+export async function savePortfolioFromJson(rawData: unknown) {
+  "use server";
+  const session = await getServerSession();
+  if (!session) redirect("/sign-in");
+
+  const username = slugify(session.user.name);
+
+  // Accept loose input and cast guard later.
+  const data: any = rawData ?? {};
+
+  const doc: PortfolioDocument = [];
+
+  if (data.header) {
+    doc.push({ section: "header", data: data.header } as HeaderSection);
+  }
+
+  if (data.about) {
+    doc.push({ section: "about", data: data.about } as AboutSection);
+  }
+
+  if (data.experience) {
+    doc.push({
+      section: "experience",
+      data: data.experience,
+    } as ExperienceSection);
+  }
+
+  if (data.education) {
+    doc.push({
+      section: "education",
+      data: data.education,
+    } as EducationSection);
+  }
+
+  if (data.skills) {
+    doc.push({ section: "skills", data: data.skills } as SkillsSection);
+  }
+
+  if (data.socials) {
+    doc.push({ section: "socials", data: data.socials } as SocialsSection);
+  }
+
+  if (data.footer) {
+    doc.push({ section: "footer", data: data.footer } as FooterSection);
+  }
+
+  if (doc.length === 0) {
+    throw new Error("No valid portfolio data found in JSON");
+  }
+
+  await updatePortfolio({
+    username,
+    content: doc,
+    published: true,
+  });
+
+  // Ensure dashboard reflects latest data
+  revalidatePath("/dashboard");
+}
