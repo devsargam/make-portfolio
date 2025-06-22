@@ -15,6 +15,13 @@
       "when": 1750610549176,
       "tag": "0001_majestic_ikaris",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1750611026581,
+      "tag": "0002_solid_maggott",
+      "breakpoints": true
     }
   ]
 }

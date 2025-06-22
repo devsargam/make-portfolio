@@ -1,0 +1,1 @@
+ALTER TABLE "portfolio" ADD COLUMN "theme" text DEFAULT 'default' NOT NULL;

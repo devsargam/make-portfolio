@@ -103,6 +103,7 @@ export const portfolio = pgTable("portfolio", {
   published: boolean("published")
     .$defaultFn(() => false)
     .notNull(),
+  theme: text("theme").$type<"default">().notNull().default("default"),
   createdAt: timestamp("created_at")
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
