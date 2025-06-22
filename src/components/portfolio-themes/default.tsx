@@ -26,8 +26,6 @@ export interface DefaultPortfolioThemeProps {
 }
 
 export function DefaultPortfolioTheme({ content }: DefaultPortfolioThemeProps) {
-  console.log(content);
-
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-16 px-4 py-12 md:px-0">
       {content.map((section, idx) => {

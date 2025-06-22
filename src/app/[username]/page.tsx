@@ -8,6 +8,17 @@ interface UserPageParams {
   username: string;
 }
 
+export async function generateStaticParams() {
+  const data = await db
+    .select()
+    .from(portfolio)
+    .where(eq(portfolio.published, true));
+
+  return data.map((portfolio) => ({
+    username: portfolio.username,
+  }));
+}
+
 export async function generateMetadata({
   params,
 }: {
