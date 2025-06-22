@@ -1,6 +1,5 @@
 import { db } from "@/db/drizzle";
 import { portfolio } from "@/db";
-import { DefaultPortfolioTheme } from "@/components/portfolio-themes/default";
 import { getServerSession } from "@/utils/get-server-session";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
@@ -280,6 +279,11 @@ export default async function Dashboard() {
   const skills = getData("skills") as SkillsSection["data"] | undefined;
   const socials = getData("socials") as SocialsSection["data"] | undefined;
   const footer = getData("footer") as FooterSection["data"] | undefined;
+
+  // Unique timestamp so that the iframe reloads whenever the page is
+  // re-rendered after a successful form submission.
+  const now = Date.now();
+  const previewUrl = `/${slugify(session.user.name)}?v=${now}`;
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-8 p-6 md:flex-row md:gap-12">
@@ -573,20 +577,11 @@ export default async function Dashboard() {
       {/* Live preview ------------------------------------------------------------- */}
       <aside className="sticky top-6 hidden h-[calc(100vh-3rem)] w-full overflow-y-auto rounded-lg border p-6 md:block md:w-[32rem]">
         <h2 className="mb-4 text-lg font-semibold">Live preview</h2>
-        {doc.length ? (
-          <DefaultPortfolioTheme content={doc} />
-        ) : (
-          <>
-            <p className="text-sm text-muted-foreground">
-              Fill out the forms on the left, then hit "Save" to see a preview
-              here.
-            </p>
-            <iframe
-              src={`/${slugify(session.user.name)}`}
-              className="h-full w-full"
-            />
-          </>
-        )}
+        {/* Always show the portfolio page inside an iframe. By appending a unique
+            timestamp query param (and using the same value as the key) the iframe
+            unmounts and reloads on every server re-render, giving us an updated
+            preview right after each form submission. */}
+        <iframe key={now} src={previewUrl} className="h-full w-full" />
       </aside>
     </div>
   );
