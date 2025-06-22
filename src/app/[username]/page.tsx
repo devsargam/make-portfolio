@@ -3,6 +3,7 @@ import { portfolio } from "@/db";
 import { eq } from "drizzle-orm";
 import { DefaultPortfolioTheme } from "@/components/portfolio-themes/default";
 import { Metadata } from "next";
+import { unstable_cache as cache } from "next/cache";
 
 interface UserPageParams {
   username: string;
@@ -35,6 +36,20 @@ export async function generateMetadata({
   };
 }
 
+export const revalidate = 3600;
+
+const getPortfolio = cache(
+  async (username: string) => {
+    return await db
+      .select()
+      .from(portfolio)
+      .where(eq(portfolio.username, username))
+      .limit(1);
+  },
+  ["portfolio-by-username"],
+  { tags: ["portfolio"] }
+);
+
 export default async function UserPage({
   params,
 }: {
@@ -42,11 +57,7 @@ export default async function UserPage({
 }) {
   const { username } = await params;
 
-  const data = await db
-    .select()
-    .from(portfolio)
-    .where(eq(portfolio.username, username))
-    .limit(1);
+  const data = await getPortfolio(username);
 
   switch (data[0]?.theme) {
     case "default":
