@@ -1,3 +1,5 @@
+import { getServerSession } from "@/utils/get-server-session";
+
 type UserPageParams = Promise<{
   username: string;
 }>;
