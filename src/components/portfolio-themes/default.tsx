@@ -9,6 +9,8 @@ import type {
   SocialsSection,
   FooterSection,
 } from "@/db/portfolio-schema";
+import { remark } from "remark";
+import html from "remark-html";
 
 /*
  * Default portfolio theme ----------------------------------------------------
@@ -80,15 +82,17 @@ function Header({ data }: { data: HeaderSection["data"] }) {
   );
 }
 
-function About({ data }: { data: AboutSection["data"] }) {
-  // Break the markdown on blank lines to get a very basic paragraph split.
-  const paragraphs = data.markdown.split(/\n\s*\n/);
+async function About({ data }: { data: AboutSection["data"] }) {
+  async function markdownToHtml(markdown: string): Promise<string> {
+    const processedContent = await remark().use(html).process(markdown);
+    return processedContent.toString();
+  }
+
+  const htmlContent = await markdownToHtml(data.markdown);
 
   return (
     <section className="prose prose-slate dark:prose-invert">
-      {paragraphs.map((text, idx) => (
-        <p key={idx}>{text}</p>
-      ))}
+      <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
     </section>
   );
 }
