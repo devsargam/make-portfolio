@@ -1,0 +1,18 @@
+---
+description: 
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+This project is called portfolio maker where people can input relevent information and we will bascially cook them a good server side rendered portfolio instantly.
+
+This is a nextjs 15 project with app router
+- better auth for authentication
+- drizzle orm for database
+- shadcn for ui components
+- tailwindcss for styling
+
+Always prefer to use react server components over client components
+Always create server action instead of creating api route
+Write clean and maintainable code as compared to performant
+Always check for authentication in required pages
+
