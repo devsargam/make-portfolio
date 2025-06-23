@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
 const publicRoutes = ["/sign-in"];
-const protectedRoutes = ["/dashboard"];
+const protectedRoutes = ["/dashboard", "/chat-wizard"];
 
 const isPublicRoute = (path: string) => {
   return publicRoutes.includes(path);
@@ -28,5 +28,5 @@ export function middleware(request: NextRequest) {
 
 // Need to make sure this is updated when the routes change
 export const config = {
-  matcher: ["/dashboard", "/sign-in"],
+  matcher: ["/dashboard", "/sign-in", "/chat-wizard"],
 };
