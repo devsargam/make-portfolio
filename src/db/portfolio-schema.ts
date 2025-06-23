@@ -89,6 +89,20 @@ export type PortfolioSection =
 
 export type PortfolioDocument = PortfolioSection[];
 
+type Theme =
+  | "default"
+  | "pink"
+  | "dark"
+  | "light"
+  | "retro"
+  | "modern"
+  | "minimal"
+  | "gradient"
+  | "neon"
+  | "matrix"
+  | "aurora"
+  | "minimal-white";
+
 /*
  * Database schema -----------------------------------------------------------
  */
@@ -103,7 +117,7 @@ export const portfolio = pgTable("portfolio", {
   published: boolean("published")
     .$defaultFn(() => false)
     .notNull(),
-  theme: text("theme").$type<"default">().notNull().default("default"),
+  theme: text("theme").$type<Theme>().notNull().default("default"),
   createdAt: timestamp("created_at")
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),

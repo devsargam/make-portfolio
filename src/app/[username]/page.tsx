@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { DefaultPortfolioTheme } from "@/components/portfolio-themes/default";
 import { Metadata } from "next";
 import { unstable_cache as cache } from "next/cache";
+import { PinkPortfolioTheme } from "@/components/portfolio-themes/pink";
 
 interface UserPageParams {
   username: string;
@@ -62,6 +63,8 @@ export default async function UserPage({
   switch (data[0]?.theme) {
     case "default":
       return <DefaultPortfolioTheme content={data[0]?.content} />;
+    case "pink":
+      return <PinkPortfolioTheme content={data[0]?.content} />;
     default:
       return <div>No theme found</div>;
   }
