@@ -89,7 +89,7 @@ export type PortfolioSection =
 
 export type PortfolioDocument = PortfolioSection[];
 
-type Theme =
+export type Theme =
   | "default"
   | "pink"
   | "dark"

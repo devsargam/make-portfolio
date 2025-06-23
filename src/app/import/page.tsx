@@ -4,10 +4,13 @@ import ImportForm from "./import-form";
 
 export default async function ImportPage() {
   const session = await getServerSession();
-  
+
   if (!session) {
     redirect("/sign-in");
   }
+
+  const name = session.user.name;
+  const avatar = session.user.image ?? "";
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
@@ -15,8 +18,8 @@ export default async function ImportPage() {
       <p className="text-muted-foreground mb-8">
         Upload your resume and we'll help you create a beautiful portfolio
       </p>
-      
-      <ImportForm />
+
+      <ImportForm name={name} avatar={avatar} />
     </div>
   );
 }

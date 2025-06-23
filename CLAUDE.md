@@ -6,6 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `pnpm dev` - Start Next.js development server with Turbopack
 - `pnpm build` - Build the application for production
+- `pnpm start` - Start production server
 - `pnpm lint` - Run Next.js linting
 - `pnpm seed` - Seed the database with initial data using `npx tsx src/db/seed.ts`
 
@@ -72,6 +73,8 @@ The application centers around a `PortfolioDocument` type - a JSON array of sect
 **Database Operations**: Use Drizzle ORM with prepared statements. Portfolio content is stored as JSONB in PostgreSQL
 
 **Styling**: TailwindCSS with Shadcn/ui components. CSS variables defined in `globals.css` for theming
+
+**Code Quality**: Prefer maintainable code over performance optimization. Always check authentication in protected pages
 
 ### Key Files
 - `src/app/actions.ts` - Server actions for portfolio CRUD operations

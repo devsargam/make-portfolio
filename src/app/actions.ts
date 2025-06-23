@@ -12,6 +12,7 @@ import {
   SkillsSection,
   SocialsSection,
   FooterSection,
+  Theme,
 } from "@/db/portfolio-schema";
 import { randomUUID } from "crypto";
 import { getServerSession } from "@/utils/get-server-session";
@@ -380,12 +381,16 @@ export async function importResume({
   resumeText,
   resumeBase64,
   fileType = "text",
+  name,
+  avatar,
 }: {
   username: string;
-  theme: string;
+  theme: Theme;
   resumeText?: string;
   resumeBase64?: string;
   fileType?: "text" | "pdf";
+  name?: string;
+  avatar?: string;
 }) {
   "use server";
   const session = await getServerSession();
@@ -404,12 +409,15 @@ export async function importResume({
     }
 
     // Prepare the prompt
+    const defaultName = name || "Full Name";
+    const defaultAvatar = avatar || null;
+
     const systemPrompt = `You are a resume parser that converts resumes into portfolio JSON format. Extract information from the resume and return ONLY valid JSON in this exact format:
 {
   "header": {
-    "name": "Full Name",
+    "name": "${defaultName}",
     "tagline": "Professional tagline",
-    "displayPicture": null
+    "displayPicture": ${defaultAvatar ? `"${defaultAvatar}"` : "null"}
   },
   "about": {
     "markdown": "A professional summary in markdown format"
@@ -444,7 +452,8 @@ export async function importResume({
   }
 }`;
 
-    const userPrompt = "Parse this resume and return ONLY the JSON format specified.";
+    const userPrompt =
+      "Parse this resume and return ONLY the JSON format specified.";
 
     // Call the AI chat endpoint to process the resume
     const response = await fetch(
@@ -464,7 +473,10 @@ export async function importResume({
             },
             {
               role: "user",
-              content: fileType === "pdf" ? userPrompt : `${userPrompt}\n\n${resumeText}`,
+              content:
+                fileType === "pdf"
+                  ? userPrompt
+                  : `${userPrompt}\n\n${resumeText}`,
             },
           ],
         }),
@@ -488,7 +500,10 @@ export async function importResume({
     const doc: PortfolioDocument = [];
 
     if (portfolioData.header) {
-      doc.push({ section: "header", data: portfolioData.header } as HeaderSection);
+      doc.push({
+        section: "header",
+        data: portfolioData.header,
+      } as HeaderSection);
     }
 
     if (portfolioData.about) {
@@ -510,15 +525,24 @@ export async function importResume({
     }
 
     if (portfolioData.skills) {
-      doc.push({ section: "skills", data: portfolioData.skills } as SkillsSection);
+      doc.push({
+        section: "skills",
+        data: portfolioData.skills,
+      } as SkillsSection);
     }
 
     if (portfolioData.socials) {
-      doc.push({ section: "socials", data: portfolioData.socials } as SocialsSection);
+      doc.push({
+        section: "socials",
+        data: portfolioData.socials,
+      } as SocialsSection);
     }
 
     if (portfolioData.footer) {
-      doc.push({ section: "footer", data: portfolioData.footer } as FooterSection);
+      doc.push({
+        section: "footer",
+        data: portfolioData.footer,
+      } as FooterSection);
     }
 
     // Save the portfolio
@@ -530,16 +554,16 @@ export async function importResume({
         username,
         content: doc,
         published: true,
-        theme: theme as "default" | "pink" | "midnight",
+        theme: theme,
         updatedAt: new Date(),
       })
       .onConflictDoUpdate({
         target: portfolio.username,
-        set: { 
-          content: doc, 
-          published: true, 
-          theme: theme as "default" | "pink" | "midnight", 
-          updatedAt: new Date() 
+        set: {
+          content: doc,
+          published: true,
+          theme: theme,
+          updatedAt: new Date(),
         },
       });
 
@@ -549,9 +573,9 @@ export async function importResume({
     return { success: true };
   } catch (error) {
     console.error("Import resume error:", error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : "Failed to import resume" 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to import resume",
     };
   }
 }

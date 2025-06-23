@@ -64,6 +64,10 @@ export default async function Dashboard() {
     )?.data;
 
   const header = getData("header") as HeaderSection["data"] | undefined;
+  
+  // GitHub defaults
+  const githubName = session.user.name;
+  const githubAvatar = session.user.image;
   const about = getData("about") as AboutSection["data"] | undefined;
   const experience = getData("experience") as
     | ExperienceSection["data"]
@@ -97,7 +101,7 @@ export default async function Dashboard() {
                 id="name"
                 name="name"
                 required
-                defaultValue={header?.name ?? ""}
+                defaultValue={header?.name ?? githubName ?? ""}
               />
             </div>
 
@@ -120,7 +124,7 @@ export default async function Dashboard() {
                 id="displayPicture"
                 name="displayPicture"
                 type="url"
-                defaultValue={header?.displayPicture ?? ""}
+                defaultValue={header?.displayPicture ?? githubAvatar ?? ""}
               />
             </div>
 

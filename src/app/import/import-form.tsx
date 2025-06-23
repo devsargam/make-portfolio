@@ -5,10 +5,17 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { importResume } from "@/app/actions";
 import { Loader2 } from "lucide-react";
+import { Theme } from "@/db";
 
 const themes = [
   { value: "default", label: "Default" },
@@ -16,11 +23,16 @@ const themes = [
   { value: "midnight", label: "Midnight" },
 ];
 
-export default function ImportForm() {
+interface ImportFormProps {
+  name?: string;
+  avatar?: string;
+}
+
+export default function ImportForm({ name, avatar }: ImportFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [username, setUsername] = useState("");
-  const [theme, setTheme] = useState("default");
+  const [theme, setTheme] = useState<Theme>("default");
   const [resumeText, setResumeText] = useState("");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [error, setError] = useState("");
@@ -51,18 +63,22 @@ export default function ImportForm() {
 
     try {
       let result;
-      
+
       if (resumeFile && resumeFile.type === "application/pdf") {
         // For PDFs, convert to base64 and send
         const arrayBuffer = await resumeFile.arrayBuffer();
-        const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-        
+        const base64 = btoa(
+          String.fromCharCode(...new Uint8Array(arrayBuffer))
+        );
+
         result = await importResume({
           username,
-          theme,
+          theme: theme,
           resumeText: "",
           resumeBase64: base64,
           fileType: "pdf",
+          name,
+          avatar,
         });
       } else {
         // For text files
@@ -71,6 +87,8 @@ export default function ImportForm() {
           theme,
           resumeText,
           fileType: "text",
+          name,
+          avatar,
         });
       }
 
@@ -107,7 +125,10 @@ export default function ImportForm() {
 
       <div className="space-y-2">
         <Label htmlFor="theme">Theme</Label>
-        <Select value={theme} onValueChange={setTheme}>
+        <Select
+          value={theme}
+          onValueChange={(value) => setTheme(value as Theme)}
+        >
           <SelectTrigger id="theme">
             <SelectValue />
           </SelectTrigger>
