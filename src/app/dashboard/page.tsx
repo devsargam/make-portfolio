@@ -22,6 +22,10 @@ import {
   saveExperience,
   saveEducation,
 } from "../actions";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
 function slugify(str: string): string {
   return str
@@ -86,49 +90,43 @@ export default async function Dashboard() {
           </summary>
           <form action={saveHeader} className="mt-4 space-y-4">
             <div className="flex flex-col gap-2">
-              <label htmlFor="name" className="text-sm font-medium">
+              <Label htmlFor="name">
                 Name
-              </label>
-              <input
+              </Label>
+              <Input
                 id="name"
                 name="name"
                 required
                 defaultValue={header?.name ?? ""}
-                className="rounded-md border px-3 py-2"
               />
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="tagline" className="text-sm font-medium">
+              <Label htmlFor="tagline">
                 Tagline
-              </label>
-              <input
+              </Label>
+              <Input
                 id="tagline"
                 name="tagline"
                 defaultValue={header?.tagline ?? ""}
-                className="rounded-md border px-3 py-2"
               />
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="displayPicture" className="text-sm font-medium">
+              <Label htmlFor="displayPicture">
                 Display picture URL
-              </label>
-              <input
+              </Label>
+              <Input
                 id="displayPicture"
                 name="displayPicture"
                 type="url"
                 defaultValue={header?.displayPicture ?? ""}
-                className="rounded-md border px-3 py-2"
               />
             </div>
 
-            <button
-              type="submit"
-              className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
-            >
+            <Button type="submit">
               Save
-            </button>
+            </Button>
           </form>
         </details>
 
@@ -139,23 +137,19 @@ export default async function Dashboard() {
           </summary>
           <form action={saveAbout} className="mt-4 space-y-4">
             <div className="flex flex-col gap-2">
-              <label htmlFor="markdown" className="text-sm font-medium">
+              <Label htmlFor="markdown">
                 Markdown
-              </label>
-              <textarea
+              </Label>
+              <Textarea
                 id="markdown"
                 name="markdown"
                 rows={6}
                 defaultValue={about?.markdown ?? ""}
-                className="rounded-md border px-3 py-2"
               />
             </div>
-            <button
-              type="submit"
-              className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
-            >
+            <Button type="submit">
               Save
-            </button>
+            </Button>
           </form>
         </details>
 
@@ -172,52 +166,46 @@ export default async function Dashboard() {
                   <legend className="text-sm font-medium">
                     Position {idx + 1}
                   </legend>
-                  <input
+                  <Input
                     type="text"
                     name="company[]"
                     placeholder="Company"
                     defaultValue={item?.company ?? ""}
-                    className="w-full rounded-md border px-3 py-2"
                   />
-                  <input
+                  <Input
                     type="text"
                     name="role[]"
                     placeholder="Role"
                     defaultValue={item?.role ?? ""}
-                    className="w-full rounded-md border px-3 py-2"
                   />
-                  <input
+                  <Input
                     type="text"
                     name="location[]"
                     placeholder="Location"
                     defaultValue={item?.location ?? ""}
-                    className="w-full rounded-md border px-3 py-2"
                   />
                   <div className="flex gap-4">
-                    <input
+                    <Input
                       type="text"
                       name="start[]"
                       placeholder="Start (YYYY or YYYY-MM)"
                       defaultValue={item?.start ?? ""}
-                      className="flex-1 rounded-md border px-3 py-2"
+                      className="flex-1"
                     />
-                    <input
+                    <Input
                       type="text"
                       name="end[]"
                       placeholder="End (YYYY or YYYY-MM)"
                       defaultValue={item?.end ?? ""}
-                      className="flex-1 rounded-md border px-3 py-2"
+                      className="flex-1"
                     />
                   </div>
                 </fieldset>
               );
             })}
-            <button
-              type="submit"
-              className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
-            >
+            <Button type="submit">
               Save
-            </button>
+            </Button>
           </form>
         </details>
 
@@ -234,45 +222,40 @@ export default async function Dashboard() {
                   <legend className="text-sm font-medium">
                     Education {idx + 1}
                   </legend>
-                  <input
+                  <Input
                     type="text"
                     name="institution[]"
                     placeholder="Institution"
                     defaultValue={item?.institution ?? ""}
-                    className="w-full rounded-md border px-3 py-2"
                   />
-                  <input
+                  <Input
                     type="text"
                     name="degree[]"
                     placeholder="Degree"
                     defaultValue={item?.degree ?? ""}
-                    className="w-full rounded-md border px-3 py-2"
                   />
                   <div className="flex gap-4">
-                    <input
+                    <Input
                       type="text"
                       name="eduStart[]"
                       placeholder="Start (YYYY)"
                       defaultValue={item?.start ?? ""}
-                      className="flex-1 rounded-md border px-3 py-2"
+                      className="flex-1"
                     />
-                    <input
+                    <Input
                       type="text"
                       name="eduEnd[]"
                       placeholder="End (YYYY)"
                       defaultValue={item?.end ?? ""}
-                      className="flex-1 rounded-md border px-3 py-2"
+                      className="flex-1"
                     />
                   </div>
                 </fieldset>
               );
             })}
-            <button
-              type="submit"
-              className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
-            >
+            <Button type="submit">
               Save
-            </button>
+            </Button>
           </form>
         </details>
 
@@ -283,22 +266,18 @@ export default async function Dashboard() {
           </summary>
           <form action={saveSkills} className="mt-4 space-y-4">
             <div className="flex flex-col gap-2">
-              <label htmlFor="skills" className="text-sm font-medium">
+              <Label htmlFor="skills">
                 Comma-separated list
-              </label>
-              <input
+              </Label>
+              <Input
                 id="skills"
                 name="skills"
                 defaultValue={skills?.join(", ") ?? ""}
-                className="rounded-md border px-3 py-2"
               />
             </div>
-            <button
-              type="submit"
-              className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
-            >
+            <Button type="submit">
               Save
-            </button>
+            </Button>
           </form>
         </details>
 
@@ -312,29 +291,26 @@ export default async function Dashboard() {
               const item = socials?.[idx];
               return (
                 <div key={idx} className="flex gap-4">
-                  <input
+                  <Input
                     type="text"
                     name="platform[]"
                     placeholder="Platform"
                     defaultValue={item?.platform ?? ""}
-                    className="flex-1 rounded-md border px-3 py-2"
+                    className="flex-1"
                   />
-                  <input
+                  <Input
                     type="url"
                     name="url[]"
                     placeholder="URL"
                     defaultValue={item?.url ?? ""}
-                    className="flex-1 rounded-md border px-3 py-2"
+                    className="flex-1"
                   />
                 </div>
               );
             })}
-            <button
-              type="submit"
-              className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
-            >
+            <Button type="submit">
               Save
-            </button>
+            </Button>
           </form>
         </details>
 
@@ -345,22 +321,18 @@ export default async function Dashboard() {
           </summary>
           <form action={saveFooter} className="mt-4 space-y-4">
             <div className="flex flex-col gap-2">
-              <label htmlFor="text" className="text-sm font-medium">
+              <Label htmlFor="text">
                 Text
-              </label>
-              <input
+              </Label>
+              <Input
                 id="text"
                 name="text"
                 defaultValue={footer?.text ?? ""}
-                className="rounded-md border px-3 py-2"
               />
             </div>
-            <button
-              type="submit"
-              className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
-            >
+            <Button type="submit">
               Save
-            </button>
+            </Button>
           </form>
         </details>
       </div>
