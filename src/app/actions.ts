@@ -373,3 +373,185 @@ export async function savePortfolioFromJson(rawData: unknown) {
   // Ensure dashboard reflects latest data
   revalidatePath("/dashboard");
 }
+
+export async function importResume({
+  username,
+  theme,
+  resumeText,
+  resumeBase64,
+  fileType = "text",
+}: {
+  username: string;
+  theme: string;
+  resumeText?: string;
+  resumeBase64?: string;
+  fileType?: "text" | "pdf";
+}) {
+  "use server";
+  const session = await getServerSession();
+  if (!session) redirect("/sign-in");
+
+  try {
+    // Check if username is already taken
+    const existing = await db
+      .select()
+      .from(portfolio)
+      .where(eq(portfolio.username, username))
+      .limit(1);
+
+    if (existing.length > 0 && existing[0].userId !== session.user.id) {
+      return { success: false, error: "Username is already taken" };
+    }
+
+    // Prepare the prompt
+    const systemPrompt = `You are a resume parser that converts resumes into portfolio JSON format. Extract information from the resume and return ONLY valid JSON in this exact format:
+{
+  "header": {
+    "name": "Full Name",
+    "tagline": "Professional tagline",
+    "displayPicture": null
+  },
+  "about": {
+    "markdown": "A professional summary in markdown format"
+  },
+  "experience": [
+    {
+      "company": "Company Name",
+      "role": "Job Title",
+      "start": "Start Date",
+      "end": "End Date or null for current",
+      "location": "Location",
+      "highlights": ["Achievement 1", "Achievement 2"]
+    }
+  ],
+  "education": [
+    {
+      "institution": "School Name",
+      "degree": "Degree Name",
+      "start": "Start Date",
+      "end": "End Date"
+    }
+  ],
+  "skills": ["Skill 1", "Skill 2", "Skill 3"],
+  "socials": [
+    {
+      "platform": "LinkedIn",
+      "url": "https://linkedin.com/in/username"
+    }
+  ],
+  "footer": {
+    "text": "© 2024 Name. All rights reserved."
+  }
+}`;
+
+    const userPrompt = "Parse this resume and return ONLY the JSON format specified.";
+
+    // Call the AI chat endpoint to process the resume
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/chat`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          stream: false,
+          pdfBase64: fileType === "pdf" ? resumeBase64 : undefined,
+          messages: [
+            {
+              role: "system",
+              content: systemPrompt,
+            },
+            {
+              role: "user",
+              content: fileType === "pdf" ? userPrompt : `${userPrompt}\n\n${resumeText}`,
+            },
+          ],
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to process resume");
+    }
+
+    const text = await response.text();
+    // Extract JSON from the response (it might contain markdown code blocks)
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("No valid JSON found in response");
+    }
+
+    const portfolioData = JSON.parse(jsonMatch[0]);
+
+    // Create the portfolio document
+    const doc: PortfolioDocument = [];
+
+    if (portfolioData.header) {
+      doc.push({ section: "header", data: portfolioData.header } as HeaderSection);
+    }
+
+    if (portfolioData.about) {
+      doc.push({ section: "about", data: portfolioData.about } as AboutSection);
+    }
+
+    if (portfolioData.experience) {
+      doc.push({
+        section: "experience",
+        data: portfolioData.experience,
+      } as ExperienceSection);
+    }
+
+    if (portfolioData.education) {
+      doc.push({
+        section: "education",
+        data: portfolioData.education,
+      } as EducationSection);
+    }
+
+    if (portfolioData.skills) {
+      doc.push({ section: "skills", data: portfolioData.skills } as SkillsSection);
+    }
+
+    if (portfolioData.socials) {
+      doc.push({ section: "socials", data: portfolioData.socials } as SocialsSection);
+    }
+
+    if (portfolioData.footer) {
+      doc.push({ section: "footer", data: portfolioData.footer } as FooterSection);
+    }
+
+    // Save the portfolio
+    await db
+      .insert(portfolio)
+      .values({
+        id: randomUUID(),
+        userId: session.user.id,
+        username,
+        content: doc,
+        published: true,
+        theme: theme as "default" | "pink" | "midnight",
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: portfolio.username,
+        set: { 
+          content: doc, 
+          published: true, 
+          theme: theme as "default" | "pink" | "midnight", 
+          updatedAt: new Date() 
+        },
+      });
+
+    revalidatePath("/dashboard");
+    revalidateTag("portfolio");
+
+    return { success: true };
+  } catch (error) {
+    console.error("Import resume error:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Failed to import resume" 
+    };
+  }
+}
